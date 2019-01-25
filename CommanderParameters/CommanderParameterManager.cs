@@ -15,7 +15,7 @@ namespace CommanderParameters
             string result = "File created succesfully";
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(MernokAssetFile));
+                XmlSerializer serializer = new XmlSerializer(typeof(CommanderParameterFile));
                 using (TextWriter writer = new StreamWriter(@"C:\Commander\Infrastructure\MernokAssetMasterList.xml"))
                 {
                     serializer.Serialize(writer, f);
@@ -38,8 +38,8 @@ namespace CommanderParameters
             XmlSerializer deserializer = new XmlSerializer(typeof(CommanderParameterFile));
             string appPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
             TextReader reader = new StreamReader(filename);//(Environment.CurrentDirectory + @"\C2xxParameters.xml");
-            MernokAssetContent = reader.ReadToEnd();
-            reader = new StringReader((string)MernokAssetContent.Clone());
+            CommanderParameterContent = reader.ReadToEnd();
+            reader = new StringReader((string)CommanderParameterContent.Clone());
             object obj = deserializer.Deserialize(reader);
             CommanderParameterFile f = (CommanderParameterFile)obj;
             reader.Close();

@@ -7,11 +7,20 @@ using System.Threading.Tasks;
 namespace CommanderParameters
 {
     public class CommanderParameter
-    {
+    {       
+        public string Name;
         public byte Type;
-        public byte Group;
-        public bool IsLicensable;
-        public string TypeName;
-        public string GroupName;
+        public int Value;
+        public int MaxValue;
+        public int MinValue;
+        public int DefValue;
+    }
+
+    public class CommanderParameterFile
+    {
+        public List<CommanderParameter> CommanderParameterList;
+        public UInt16 version;
+        public DateTime dateCreated;
+        public string createdBy;            //Name of file creator
     }
 }
