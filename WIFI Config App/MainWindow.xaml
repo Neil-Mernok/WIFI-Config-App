@@ -10,7 +10,7 @@
     <Viewbox Stretch="Fill">
         <Grid Height="768" Width="1054" Opacity="100" Background="White">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -29,9 +29,28 @@
             </Grid.ColumnDefinitions>
 
             <!--Row 0-->
-            <Button x:Name="ConnectBtn" Content="Create WIFI AP" Click="Button_Click" />
+            <Grid Height="25" VerticalAlignment="Top" Grid.ColumnSpan="4">
+                <Menu x:Name="menu" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                    <MenuItem Header="File" Height="25" Width="35">
+                        <MenuItem x:Name="MenuTCPServer" Header="Create TPC server" Margin="0,0,-41,0" Click="CreateServer_Click" />
+                        <MenuItem x:Name="MenuTWifiAP" Header="Create/Stop Wifi Access point" Margin="0,0,-41,0" Click="Button_Click" />
+                        <MenuItem  Header="Exit application" Margin="0,0,-41,0" />
+                    </MenuItem>
+                    <MenuItem x:Name="AboutMenu" Header="About" Click="AboutMenu_Click"/>
+                    <MenuItem Header="Commands">
+                        <MenuItem x:Name="Menu_Reset_toDef" Header="Reset parameters to default" Margin="0,0,-5,0" />
+                        <MenuItem x:Name="Menu_UpdateTime" Header="Update Time and Date of unit" Margin="0,0,-40,0" />
+                        <MenuItem x:Name="ParmHex_menu" Header="Export Parameters to a .mer file" Margin="0,0,-33,0" />
+                        <MenuItem x:Name="ParmXML_menu" Header="Update Parameters in .xml file" Margin="0,0,-33,0" />
+                        <MenuItem x:Name="CommisionTrue" Header="Set to Commission state" Height="25" Margin="0,0,-17,0" />
+                        <MenuItem x:Name="Bootload" Header="Update firmware of connected device" Height="25" Margin="0,0,-17,0" />
+                    </MenuItem>
+                </Menu>
+            </Grid>
+            
+            <!--<Button x:Name="ConnectBtn" Content="Create WIFI AP" Click="Button_Click" />
             <Button x:Name="CreateServer" Content="CreateTCPserver" Grid.Column="2" Click="CreateServer_Click"/>
-            <Button x:Name="SendMessage" Content="SendMessage" Grid.Column="4" Click="SendMessage_Click" />
+            <Button x:Name="SendMessage" Content="SendMessage" Grid.Column="4" Click="SendMessage_Click" />-->
 
 
             <!--Row 1-->

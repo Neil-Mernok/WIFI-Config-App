@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommanderParameters", "CommanderParameters\CommanderParameters.csproj", "{36E36585-8605-44CB-8221-A830C1F30435}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AboutWindow", "AboutWindow\AboutWindow.csproj", "{AF571A9D-EE14-4C9F-BAC2-986FBBED5654}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{36E36585-8605-44CB-8221-A830C1F30435}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36E36585-8605-44CB-8221-A830C1F30435}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36E36585-8605-44CB-8221-A830C1F30435}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF571A9D-EE14-4C9F-BAC2-986FBBED5654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF571A9D-EE14-4C9F-BAC2-986FBBED5654}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF571A9D-EE14-4C9F-BAC2-986FBBED5654}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF571A9D-EE14-4C9F-BAC2-986FBBED5654}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

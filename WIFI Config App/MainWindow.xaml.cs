@@ -31,7 +31,7 @@ namespace WIFI_Config_App
             CommanderParameterFile = CommanderParameterManager.ReadCommanderParameterFile();
 
             CommanderParametersGrid.ItemsSource = CommanderParameterFile.CommanderParameterList;
-            WiFimessages.ParameterListsize = CommanderParameterFile.CommanderParameterList.Count;
+            WiFimessages.ParameterListsize = CommanderParameterFile.CommanderParameterList.Count*4;
 
             //  DispatcherTimer setup
             dispatcherTimer = new DispatcherTimer();
@@ -94,13 +94,13 @@ namespace WIFI_Config_App
             if (!connect)
             {
                 WIFIcofig.Hotspot(ssid, key, true);                
-                ConnectBtn.Content = "Stop";
+                //ConnectBtn.Content = "Stop";
                 connect = true;
             }
             else
             {
                 WIFIcofig.Hotspot(null, null, false);
-                ConnectBtn.Content = "Start";
+                //ConnectBtn.Content = "Start";
                 connect = false;
             }
 
@@ -158,6 +158,12 @@ namespace WIFI_Config_App
         private void Broadcast_Unchecked(object sender, RoutedEventArgs e)
         {
             WIFIcofig.BroadCast = false;
+        }
+
+        private void AboutMenu_Click(object sender, RoutedEventArgs e)
+        {
+            AboutWindow.MainWindow CommanderUART_About = new AboutWindow.MainWindow();
+            CommanderUART_About.Show();
         }
     }
 }
