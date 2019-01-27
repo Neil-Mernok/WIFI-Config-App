@@ -16,7 +16,7 @@ namespace CommanderParameters
             try
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(CommanderParameterFile));
-                using (TextWriter writer = new StreamWriter(@"C:\Commander\Infrastructure\MernokAssetMasterList.xml"))
+                using (TextWriter writer = new StreamWriter(@"C:\Commander\CommanderParameterList.xml"))
                 {
                     serializer.Serialize(writer, f);
                 }
@@ -31,13 +31,14 @@ namespace CommanderParameters
 
         public static string CommanderParameterContent { get; set; }
         //todo: Change this to accept a path for the file
-        public static CommanderParameterFile ReadCommanderParameterFile(string filename)
+        //public static CommanderParameterFile ReadCommanderParameterFile(string filename)
+        public static CommanderParameterFile ReadCommanderParameterFile()
         {
             //todo: add exception handling
             //Try Read the XML file
             XmlSerializer deserializer = new XmlSerializer(typeof(CommanderParameterFile));
             string appPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
-            TextReader reader = new StreamReader(filename);//(Environment.CurrentDirectory + @"\C2xxParameters.xml");
+            TextReader reader = new StreamReader(@"C:\Commander\CommanderParameterList.xml");//(Environment.CurrentDirectory + @"\C2xxParameters.xml");
             CommanderParameterContent = reader.ReadToEnd();
             reader = new StringReader((string)CommanderParameterContent.Clone());
             object obj = deserializer.Deserialize(reader);

@@ -5,6 +5,7 @@ using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using CommanderParameters;
 
 namespace WIFI_Config_App
 {
@@ -17,6 +18,8 @@ namespace WIFI_Config_App
         public bool Connect { get => connect; set => connect = value; }
         public List<string> LocalIps = new List<string>();
 
+        public static CommanderParameterFile CommanderParameterFile = new CommanderParameterFile();
+
         WIFIcofig WIFIcofig = new WIFIcofig();
         private DispatcherTimer dispatcherTimer;
 
@@ -25,6 +28,10 @@ namespace WIFI_Config_App
             InitializeComponent();
             WIFIcofig.ServerStatus = "Disconnected";
             WIFIcofig.IpWatcherStart();
+            CommanderParameterFile = CommanderParameterManager.ReadCommanderParameterFile();
+
+            CommanderParametersGrid.ItemsSource = CommanderParameterFile.CommanderParameterList;
+            WiFimessages.ParameterListsize = CommanderParameterFile.CommanderParameterList.Count;
 
             //  DispatcherTimer setup
             dispatcherTimer = new DispatcherTimer();

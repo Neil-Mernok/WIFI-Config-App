@@ -50,7 +50,8 @@
             <CheckBox x:Name="Broadcast" Grid.Row="2" Grid.Column="5" Checked="Broadcast_Checked" Unchecked="Broadcast_Unchecked" />
 
             <!--Row 3-->
-            <ListView x:Name="MessagesGet" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Stretch" Grid.RowSpan="2" Margin="0,0,0,-631" />
+            <ListView x:Name="MessagesGet" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Stretch" Grid.RowSpan="2" Margin="0,0,0,-609" />
+            <DataGrid x:Name="CommanderParametersGrid" Grid.Column="6" HorizontalAlignment="Left" Height="748" Margin="0,10,0,-604" Grid.RowSpan="5" VerticalAlignment="Top" Width="387"/>
 
         </Grid>
     </Viewbox>

@@ -8,12 +8,12 @@ namespace CommanderParameters
 {
     public class CommanderParameter
     {       
-        public string Name;
-        public byte Type;
-        public int Value;
-        public int MaxValue;
-        public int MinValue;
-        public int DefValue;
+        public string Name { get; set; }
+        public byte Type { get; set; }
+        public int Value { get; set; }
+        public int MaxValue { get; set; }
+        public int MinValue { get; set; }
+        public int DefValue { get; set; }
     }
 
     public class CommanderParameterFile

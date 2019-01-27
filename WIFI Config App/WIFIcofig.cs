@@ -178,7 +178,9 @@ namespace WIFI_Config_App
         IPEndPoint ip;
         Socket socket;
         Socket client;
-        public static List<Socket> clients;        
+        public static List<Socket> clients;
+
+        WiFimessages WiFimessages = new WiFimessages();
 
         private void StartServer()
         {
@@ -266,6 +268,7 @@ namespace WIFI_Config_App
                             string recmeg = Encoding.ASCII.GetString(data2, 0, i);
                             Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint);
                             ServerMessage.Add(recmeg + "from:" + clientR[0].RemoteEndPoint);
+                            WiFimessages.Parse(data2);
                             data2 = new byte[1024];
                         }                              
                 }
@@ -376,4 +379,5 @@ namespace WIFI_Config_App
         }
 
     }
+
 }
