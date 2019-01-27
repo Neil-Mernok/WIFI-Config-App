@@ -59,20 +59,20 @@ namespace WIFI_Config_App
             }
         }
 
-        private string _selectedIP;
+        private static string _selectedIP;
 
-        public string SelectedIP
+        public static string SelectedIP
         {
             get { return _selectedIP; }
-            set { _selectedIP = value; OnPropertyChanged("SelectedIP"); }
+            set { _selectedIP = value; }
         }
 
-        private bool _broadCast;
+        private static bool _broadCast;
 
-        public bool BroadCast
+        public static bool BroadCast
         {
             get { return _broadCast; }
-            set { _broadCast = value; OnPropertyChanged("BroadCast"); }
+            set { _broadCast = value; }
         }
 
 
@@ -268,7 +268,7 @@ namespace WIFI_Config_App
                             string recmeg = Encoding.ASCII.GetString(data2, 0, i);
                             Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint);
                             ServerMessage.Add(recmeg + "from:" + clientR[0].RemoteEndPoint);
-                            WiFimessages.Parse(data2);
+                            WiFimessages.Parse(data2, clientnumr);
                             data2 = new byte[1024];
                         }                              
                 }

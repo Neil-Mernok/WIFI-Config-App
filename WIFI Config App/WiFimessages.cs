@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +12,6 @@ namespace WIFI_Config_App
     {
 
         public static CommanderParameterFile CommanderParameterFile = new CommanderParameterFile();
-
         public static int MessageLength = 11;
         int package_success = 0;
         int package_recieved = 0;
@@ -66,7 +66,7 @@ namespace WIFI_Config_App
         public static string TimeMessage = CommMessage1.Replace("_", "T");// "[&t  ]";
         public static string CommisionMessage = CommMessage1.Replace("_", "R");// "[&t  ]";
 
-        public void Parse(byte[] recData)
+        public void Parse(byte[] recData, EndPoint clientnumr)
         {
             List<CommanderParameter> _CommanderParms = new List<CommanderParameter>();
             package_recieved++;
@@ -76,6 +76,8 @@ namespace WIFI_Config_App
                 heartbeatCounter = 0;
                 if (recData[2] == 'h')
                 {
+                    WIFIcofig.BroadCast = false;
+                    WIFIcofig.SelectedIP = clientnumr.ToString();
                     WIFIcofig.ServerMessageSend = AcknowledgeSMessage;
                     CommsEstablished = true;
                     //Console.WriteLine("Heartbeat recieved");
