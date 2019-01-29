@@ -30,8 +30,11 @@ namespace WIFI_Config_App
             WIFIcofig.IpWatcherStart();
             CommanderParameterFile = CommanderParameterManager.ReadCommanderParameterFile();
 
-            CommanderParametersGrid.ItemsSource = CommanderParameterFile.CommanderParameterList;
+ //           CommanderParametersGrid.ItemsSource = CommanderParameterFile.CommanderParameterList;
             WiFimessages.ParameterListsize = CommanderParameterFile.CommanderParameterList.Count*4;
+
+//            lstLocal.ItemsSource = WIFIcofig.NetworkDevicesp;
+            CreateServer_Click(null, null);
 
             //  DispatcherTimer setup
             dispatcherTimer = new DispatcherTimer();
@@ -48,20 +51,29 @@ namespace WIFI_Config_App
             if (WIFIcofig.clients != null)
             {
                 ConnectedDevicesCount.Content = WIFIcofig.clients.Count;
+                if(WIFIcofig.clients.Count>0)
+                {
+                    SendFile.IsEnabled = SendMessage.IsEnabled = true;
+                }
+                else
+                    SendFile.IsEnabled = SendMessage.IsEnabled = false;
                 ConnectedDevices.ItemsSource = WIFIcofig.TCPclients;
+                
             }             
             else
             {
                 ConnectedDevicesCount.Content = "0";
-                
+                WIFIcofig.SelectedIP = "";
+                SendFile.IsEnabled = SendMessage.IsEnabled = false;
+
             }
                 
 
-            if (WIFIcofig.ServerMessage!=null && textprevCount != WIFIcofig.ServerMessage.Count)
-            {
-                MessagesGet.ItemsSource = WIFIcofig.ServerMessage;
-                textprevCount = WIFIcofig.ServerMessage.Count;
-            }
+            //if (WIFIcofig.ServerMessage!=null && textprevCount != WIFIcofig.ServerMessage.Count)
+            //{
+            //    MessagesGet.ItemsSource = WIFIcofig.ServerMessage;
+            //    textprevCount = WIFIcofig.ServerMessage.Count;
+            //}
                 
             LocalIpsCount.Content = WIFIcofig.NetworkDevicesp.Count.ToString();
             if(WIFIcofig.NetworkDevicesp.Count != prevCount)
@@ -78,7 +90,7 @@ namespace WIFI_Config_App
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             WIFIcofig.Hotspot(null, null, false);
-            Application.Current.Shutdown();
+            Environment.Exit(Environment.ExitCode);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -111,10 +123,7 @@ namespace WIFI_Config_App
 
         private void CreateServer_Click(object sender, RoutedEventArgs e)
         {
-            if (lstLocal.Items.Count != 0)
-            {
-                WIFIcofig.serverRun();
-            }
+            WIFIcofig.serverRun();
         }
 
         private int DatagridIndx = 0;
@@ -122,10 +131,10 @@ namespace WIFI_Config_App
         private void LstLocal_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             DatagridIndx = lstLocal.SelectedIndex;
-            if (DatagridIndx != -1)
-                ConnectionStatusLbl.Content = WIFIcofig.NetworkDevicesp[DatagridIndx].DeviceIP.ToString();
-            else
-                ConnectionStatusLbl.Content = "0.0.0.0";
+            //if (DatagridIndx != -1)
+            //    ConnectionStatusLbl.Content = WIFIcofig.NetworkDevicesp[DatagridIndx].DeviceIP.ToString();
+            //else
+            //    ConnectionStatusLbl.Content = "0.0.0.0";
         }
 
         private void SendMessage_Click(object sender, RoutedEventArgs e)
@@ -164,6 +173,12 @@ namespace WIFI_Config_App
         {
             AboutWindow.MainWindow CommanderUART_About = new AboutWindow.MainWindow();
             CommanderUART_About.Show();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            WIFIcofig.Hotspot(null, null, false);
+            Environment.Exit(Environment.ExitCode);
         }
     }
 }

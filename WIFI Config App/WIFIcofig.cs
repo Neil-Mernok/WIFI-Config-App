@@ -100,7 +100,8 @@ namespace WIFI_Config_App
                 return Ips;
         }
 
-        public static List<NetworkDevice> NetworkDevices = new List<NetworkDevice>();     
+        public static List<NetworkDevice> NetworkDevices = new List<NetworkDevice>();   
+        public List<Devices> Device_collection;
 
         private int i;
 
@@ -196,6 +197,7 @@ namespace WIFI_Config_App
                 socket.Listen(10); //Listen for maximum 10 connections
                
                 Thread ClientsThread = new Thread(new ThreadStart(GetClients));
+                ClientsThread.IsBackground = true;
                 ClientsThread.Start();
 
             }
@@ -223,24 +225,27 @@ namespace WIFI_Config_App
         private void GetClients()
         {
             int clientslot = 0;
-            
+            ServerStatus = "Waiting for a client...";
+            Console.WriteLine("Waiting for a client...");
             while (clientnum < 11)
             {
                 
                 try
-                {
-                    Console.WriteLine("Waiting for a client...");
+                {                   
                     client = socket.Accept();
                     clients.Add(client);
                     IPEndPoint clientep = (IPEndPoint)clients[clientnum].RemoteEndPoint;
 
                     Console.WriteLine("Connected with {0} at port {1}", clientep.Address, clientep.Port);
+                    ServerStatus = "Connected with " + clientep.Address + " at port" + clientep.Port;
                     ClientLsitChanged();
 
                     Thread readThread = new Thread(() => RecieveBytes(client.RemoteEndPoint));
+                    readThread.IsBackground = true;
                     readThread.Start();
                     clientslot = clientnum;
                     Thread sendThread = new Thread(() => SendBytes(client.RemoteEndPoint, clientslot));
+                    sendThread.IsBackground = true;
                     sendThread.Start();
 
                     clientnum++;
@@ -248,10 +253,12 @@ namespace WIFI_Config_App
                 catch
                 {
                     Console.WriteLine("Client connection failed...");
+                    ServerStatus = "Client connection failed...";
                 }
                 
             }
             Console.WriteLine("Maximum amount of clients reached!");
+            ServerStatus = "Maximum amount of clients reached!";
         }
 
         private void RecieveBytes(EndPoint clientnumr)
@@ -263,14 +270,43 @@ namespace WIFI_Config_App
                 while (!clientR[0].Poll(10, SelectMode.SelectRead))
                 {
                 
-                        if ((i = clientR[0].Receive(data2, data2.Length, SocketFlags.None)) != 0)
+                    if ((i = clientR[0].Receive(data2, data2.Length, SocketFlags.None)) != 0)
+                    {
+                        string recmeg = Encoding.ASCII.GetString(data2, 0, i);
+                        Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint);
+                        ServerStatus = "Received: " + recmeg + " from: " + clientR[0].RemoteEndPoint;
+                        ServerMessage.Add(recmeg + "from:" + clientR[0].RemoteEndPoint);
+                        //WiFimessages.Parse(data2, clientnumr);
+                        if(data2.Length>2)
                         {
-                            string recmeg = Encoding.ASCII.GetString(data2, 0, i);
-                            Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint);
-                            ServerMessage.Add(recmeg + "from:" + clientR[0].RemoteEndPoint);
-                            WiFimessages.Parse(data2, clientnumr);
-                            data2 = new byte[1024];
-                        }                              
+                            byte message = data2[0];
+                            if(message==(byte)'i')
+                            {
+                                UInt32 UID = Devices.parse_message_UID(data2);
+                                if (UID != 0)
+                                {
+
+                                    bool found = false;
+
+                                    Devices T = Device_collection.SingleOrDefault(x => x._UID == UID);
+                                    if (T == null)
+                                        T = new Devices();
+                                    else
+                                        found = true;
+
+                                    T.parse_message_into_Device(data2);
+                                    if ((found == false) && (UID != 0))
+                                    {
+                                        Device_collection.Add(T);
+                                    }
+                                    OnPropertyChanged("tag_list");
+                                }
+                            }
+
+                        }
+
+                        data2 = new byte[1024];
+                    }                              
                 }
                 Console.WriteLine("-------------- {0} closed recieve", clientnumr);
             }
@@ -300,7 +336,7 @@ namespace WIFI_Config_App
                         data = Encoding.ASCII.GetBytes(ServerMessageSend);
                         // Send back a response.
                         clientR[0].Send(data, data.Length, SocketFlags.None); //Send the data to the client
-                        ServerStatus = "Sent: " + ServerMessageSend;
+                        ServerStatus = "Sent: " + ServerMessageSend + " to " + clientR[0].RemoteEndPoint;
                         Console.WriteLine("Sent: {0}", ServerMessageSend);
                         ServerMessageSend = "";
                         //data = new byte[1024];

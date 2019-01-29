@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WIFI_Config_App"
         mc:Ignorable="d"
-        Title="MainWindow" Height="768" Width="1024" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="MainWindow" Height="768" Width="1024" Closing="Window_Closing" Loaded="Window_Loaded" FontSize="20" FontFamily="Arial Black">
 
     <Viewbox Stretch="Fill">
         <Grid Height="768" Width="1054" Opacity="100" Background="White">
@@ -14,64 +14,76 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="33"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
             <!--Row 0-->
-            <Grid Height="25" VerticalAlignment="Top" Grid.ColumnSpan="4">
-                <Menu x:Name="menu" Height="25" VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                    <MenuItem Header="File" Height="25" Width="35">
-                        <MenuItem x:Name="MenuTCPServer" Header="Create TPC server" Margin="0,0,-41,0" Click="CreateServer_Click" />
-                        <MenuItem x:Name="MenuTWifiAP" Header="Create/Stop Wifi Access point" Margin="0,0,-41,0" Click="Button_Click" />
-                        <MenuItem  Header="Exit application" Margin="0,0,-41,0" />
+            <Grid  Grid.ColumnSpan="5">
+                <Menu x:Name="menu" Height="50"  HorizontalAlignment="Stretch" FontSize="20" FontFamily="Arial Black">
+                    <MenuItem Header="File" Height="50" Width="53" >
+                        <MenuItem x:Name="MenuTWifiAP" Header="Create/Stop Wifi Access point" Click="Button_Click"  Height="50"/>
+                        <MenuItem  Header="Exit application"   Height="50" Click="MenuItem_Click"/>
                     </MenuItem>
                     <MenuItem x:Name="AboutMenu" Header="About" Click="AboutMenu_Click"/>
                     <MenuItem Header="Commands">
-                        <MenuItem x:Name="Menu_Reset_toDef" Header="Reset parameters to default" Margin="0,0,-5,0" />
-                        <MenuItem x:Name="Menu_UpdateTime" Header="Update Time and Date of unit" Margin="0,0,-40,0" />
-                        <MenuItem x:Name="ParmHex_menu" Header="Export Parameters to a .mer file" Margin="0,0,-33,0" />
-                        <MenuItem x:Name="ParmXML_menu" Header="Update Parameters in .xml file" Margin="0,0,-33,0" />
-                        <MenuItem x:Name="CommisionTrue" Header="Set to Commission state" Height="25" Margin="0,0,-17,0" />
-                        <MenuItem x:Name="Bootload" Header="Update firmware of connected device" Height="25" Margin="0,0,-17,0" />
+                        <MenuItem x:Name="Menu_Reset_toDef" Header="Reset parameters to default"   Height="50"/>
+                        <MenuItem x:Name="Menu_UpdateTime" Header="Update Time and Date of unit"   Height="50"/>
+                        <MenuItem x:Name="ParmHex_menu" Header="Export Parameters to a .mer file"   Height="50"/>
+                        <MenuItem x:Name="ParmXML_menu" Header="Update Parameters in .xml file"   Height="50"/>
+                        <MenuItem x:Name="CommisionTrue" Header="Set to Commission state"    Height="50"/>
+                        <MenuItem x:Name="Bootload" Header="Update firmware of connected device"   Height="50"/>
                     </MenuItem>
                 </Menu>
             </Grid>
             
             <!--<Button x:Name="ConnectBtn" Content="Create WIFI AP" Click="Button_Click" />
-            <Button x:Name="CreateServer" Content="CreateTCPserver" Grid.Column="2" Click="CreateServer_Click"/>
-            <Button x:Name="SendMessage" Content="SendMessage" Grid.Column="4" Click="SendMessage_Click" />-->
+            <Button x:Name="CreateServer" Content="CreateTCPserver" Grid.Column="2" Click="CreateServer_Click"/>-->
+            
 
 
             <!--Row 1-->
-            <Label x:Name="ConnectionStatusLbl" Grid.Row="1" Grid.Column="1" Content="0.0.0.0" Width="120"/>
-            <Label Grid.Row="1" Grid.Column="0" Content="Selected IP"/>
-            <Label Content="ServerStatus:" Grid.Row="1" Grid.Column="2"/>
-            <Label x:Name="LblServerStatus" Grid.Row="1" Grid.Column="3" Width="200"/>
-            <TextBox x:Name="SendmessageTextB" Grid.Row="1" Grid.Column="4" Width="100"/>
+            <Label Content="ServerStatus:" Grid.Row="1" Grid.Column="0"/>
+            <Label x:Name="LblServerStatus" Grid.Row="1" Grid.Column="1"/>
+            
 
             <!--Row 2-->
-            <DataGrid x:Name="lstLocal" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Width="340" IsReadOnly="True" AutoGenerateColumns="True"  SelectionChanged="LstLocal_SelectionChanged" ItemsSource="{Binding NetworkDevicesp}" CanUserAddRows="False"/>
-            <Label x:Name="LocalIpsCount" Grid.Row="2" Grid.Column="3"/>
-            <Label x:Name="ConnectedDevicesCount" Grid.Row="3" Grid.Column="3"/>
-            <Label x:Name="selectedIP" Grid.Row="3" Grid.Column="4"/>
-            <DataGrid x:Name="ConnectedDevices" Grid.Row="2" Grid.Column="4" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True" ItemsSource="{Binding TCPclients}" SelectionChanged="ConnectedDevices_SelectionChanged"/>
-            <CheckBox x:Name="Broadcast" Grid.Row="2" Grid.Column="5" Checked="Broadcast_Checked" Unchecked="Broadcast_Unchecked" />
+            <DataGrid x:Name="lstLocal" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Width="340" IsReadOnly="True" AutoGenerateColumns="True"  SelectionChanged="LstLocal_SelectionChanged" ItemsSource="{Binding NetworkDevicesp}" CanUserAddRows="False" Visibility="Collapsed"/>
+            <Label x:Name="LocalIpsCount" Grid.Row="2" Grid.Column="2"/>
+            <Label Content="Connected Devices:" Grid.Row="2" Grid.Column="1"/>
+            <Label x:Name="selectedIP" Grid.Row="6" Grid.Column="1"/>
+            
 
-            <!--Row 3-->
-            <ListView x:Name="MessagesGet" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Stretch" Grid.RowSpan="2" Margin="0,0,0,-609" />
-            <DataGrid x:Name="CommanderParametersGrid" Grid.Column="6" HorizontalAlignment="Left" Height="748" Margin="0,10,0,-604" Grid.RowSpan="5" VerticalAlignment="Top" Width="387"/>
 
+
+            <!--row 3-->
+            <Label x:Name="ConnectedDevicesCount" Grid.Row="2" Grid.Column="2"/>
+            <Button x:Name="SendMessage" Content="Send Message" Grid.Row="3" Click="SendMessage_Click" Height="40"/>
+            <DataGrid x:Name="ConnectedDevices" Grid.Row="3" Grid.RowSpan="3" Grid.Column="1" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True" ItemsSource="{Binding TCPclients}" SelectionChanged="ConnectedDevices_SelectionChanged"/>
+            
+            
+            
+            <!--row 4-->
+            <TextBox x:Name="SendmessageTextB" Grid.Row="4"  Height="40"/>
+            <Label Grid.Row="4" Grid.Column="2" Content="Broadcast:"/>
+            
+            <!--row 5-->
+            <Button x:Name="SendFile" Content="Send File" Grid.Row="5"  Height="40" />
+            <Viewbox Grid.Row="5" Grid.Column="2" Height="40">
+                <CheckBox x:Name="Broadcast"  Checked="Broadcast_Checked" Unchecked="Broadcast_Unchecked" />
+            </Viewbox>
         </Grid>
     </Viewbox>
 </Window>
