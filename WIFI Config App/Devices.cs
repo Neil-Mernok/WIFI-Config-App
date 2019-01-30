@@ -85,6 +85,38 @@ namespace WIFI_Config_App
             times_seen = 0;
         }
 
+        public List<Devices> Device_collection;
+
+        public void Device_parse(byte[] message)
+        {
+            if (message.Length > 2)
+            {
+                if (message[0] == (byte)'i')
+                {
+                    UInt32 UID = parse_message_UID(message);
+                    if (UID != 0)
+                    {
+
+                        bool found = false;
+
+                        Devices T = Device_collection.SingleOrDefault(x => x._UID == UID);
+                        if (T == null)
+                            T = new Devices();
+                        else
+                            found = true;
+
+                        T.parse_message_into_Device(message);
+                        if ((found == false) && (UID != 0))
+                        {
+                            Device_collection.Add(T);
+                        }
+                        OnPropertyChanged("tag_list");
+                    }
+                }
+
+            }
+        }
+
         public void parse_message_into_Device(byte[] data)
         {
             int PacketSize = 39;

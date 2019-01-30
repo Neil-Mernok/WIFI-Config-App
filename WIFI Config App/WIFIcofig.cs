@@ -78,6 +78,12 @@ namespace WIFI_Config_App
 
         public static string ServerStatus { get; set; }
 
+        public static bool BootReady { get; set; }
+
+        public static int BootSentIndex { get; set; }
+
+        public static int BootAckIndex { get; set; }
+
         public static List<string> ServerMessage { get; set; }
 
         public static string ServerMessageSend { get; set; }
@@ -100,8 +106,7 @@ namespace WIFI_Config_App
                 return Ips;
         }
 
-        public static List<NetworkDevice> NetworkDevices = new List<NetworkDevice>();   
-        public List<Devices> Device_collection;
+        public static List<NetworkDevice> NetworkDevices = new List<NetworkDevice>();          
 
         private int i;
 
@@ -182,6 +187,7 @@ namespace WIFI_Config_App
         public static List<Socket> clients;
 
         WiFimessages WiFimessages = new WiFimessages();
+        Bootloader bootloader = new Bootloader();
 
         private void StartServer()
         {
@@ -266,7 +272,7 @@ namespace WIFI_Config_App
             try
             {
                 List<Socket> clientR = clients.Where(t => t.RemoteEndPoint == clientnumr).ToList();
-                byte[] data2 = new byte[1024];
+                byte[] data2 = new byte[522];
                 while (!clientR[0].Poll(10, SelectMode.SelectRead))
                 {
                 
@@ -277,35 +283,9 @@ namespace WIFI_Config_App
                         ServerStatus = "Received: " + recmeg + " from: " + clientR[0].RemoteEndPoint;
                         ServerMessage.Add(recmeg + "from:" + clientR[0].RemoteEndPoint);
                         //WiFimessages.Parse(data2, clientnumr);
-                        if(data2.Length>2)
-                        {
-                            byte message = data2[0];
-                            if(message==(byte)'i')
-                            {
-                                UInt32 UID = Devices.parse_message_UID(data2);
-                                if (UID != 0)
-                                {
+                        bootloader.BootloaderParse(data2, clientnumr);
 
-                                    bool found = false;
-
-                                    Devices T = Device_collection.SingleOrDefault(x => x._UID == UID);
-                                    if (T == null)
-                                        T = new Devices();
-                                    else
-                                        found = true;
-
-                                    T.parse_message_into_Device(data2);
-                                    if ((found == false) && (UID != 0))
-                                    {
-                                        Device_collection.Add(T);
-                                    }
-                                    OnPropertyChanged("tag_list");
-                                }
-                            }
-
-                        }
-
-                        data2 = new byte[1024];
+                        data2 = new byte[522];
                     }                              
                 }
                 Console.WriteLine("-------------- {0} closed recieve", clientnumr);
@@ -319,9 +299,10 @@ namespace WIFI_Config_App
 
         private void SendBytes(EndPoint clientnumr, int remover)
         {
-            byte[] data = new byte[1024];
+            
 
-            string welcome = "Welcome"; //This is the data we we'll respond with                       
+            string welcome = "Welcome"; //This is the data we we'll respond with      
+            byte[] data = new byte[welcome.Length];
             data = Encoding.ASCII.GetBytes(welcome); //Encode the data
             List<Socket> clientR = clients.Where(t => t.RemoteEndPoint == clientnumr).ToList();
             clientR[0].Send(data, data.Length, SocketFlags.None); //Send the data to the client
@@ -339,7 +320,6 @@ namespace WIFI_Config_App
                         ServerStatus = "Sent: " + ServerMessageSend + " to " + clientR[0].RemoteEndPoint;
                         Console.WriteLine("Sent: {0}", ServerMessageSend);
                         ServerMessageSend = "";
-                        //data = new byte[1024];
                     }
                 }
                 catch
@@ -353,6 +333,55 @@ namespace WIFI_Config_App
             clients.Remove(clientR[0]);
             ClientLsitChanged();
             clientnum--;
+        }
+    }
+
+    public enum InitialCrcValue { Zeros, NonZero1 = 0xffff, NonZero2 = 0x1D0F }
+
+    public class Crc16Ccitt
+    {
+        const ushort poly = 0x1021;
+        ushort[] table = new ushort[256];
+        ushort initialValue = 0;
+
+        public ushort ComputeChecksum(byte[] bytes)
+        {
+            ushort crc = this.initialValue;
+            for (int i = 0; i < bytes.Length; ++i)
+            {
+                crc = (ushort)((crc << 8) ^ table[((crc >> 8) ^ (0xff & bytes[i]))]);
+            }
+            return crc;
+        }
+
+        public byte[] ComputeChecksumBytes(byte[] bytes)
+        {
+            ushort crc = ComputeChecksum(bytes);
+            return BitConverter.GetBytes(crc);
+        }
+
+        public Crc16Ccitt(InitialCrcValue initialValue)
+        {
+            this.initialValue = (ushort)initialValue;
+            ushort temp, a;
+            for (int i = 0; i < table.Length; ++i)
+            {
+                temp = 0;
+                a = (ushort)(i << 8);
+                for (int j = 0; j < 8; ++j)
+                {
+                    if (((temp ^ a) & 0x8000) != 0)
+                    {
+                        temp = (ushort)((temp << 1) ^ poly);
+                    }
+                    else
+                    {
+                        temp <<= 1;
+                    }
+                    a <<= 1;
+                }
+                table[i] = temp;
+            }
         }
     }
 

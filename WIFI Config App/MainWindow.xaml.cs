@@ -28,10 +28,10 @@ namespace WIFI_Config_App
             InitializeComponent();
             WIFIcofig.ServerStatus = "Disconnected";
             WIFIcofig.IpWatcherStart();
-            CommanderParameterFile = CommanderParameterManager.ReadCommanderParameterFile();
+//            CommanderParameterFile = CommanderParameterManager.ReadCommanderParameterFile();
 
  //           CommanderParametersGrid.ItemsSource = CommanderParameterFile.CommanderParameterList;
-            WiFimessages.ParameterListsize = CommanderParameterFile.CommanderParameterList.Count*4;
+ //           WiFimessages.ParameterListsize = CommanderParameterFile.CommanderParameterList.Count*4;
 
 //            lstLocal.ItemsSource = WIFIcofig.NetworkDevicesp;
             CreateServer_Click(null, null);
@@ -53,18 +53,23 @@ namespace WIFI_Config_App
                 ConnectedDevicesCount.Content = WIFIcofig.clients.Count;
                 if(WIFIcofig.clients.Count>0)
                 {
-                    SendFile.IsEnabled = SendMessage.IsEnabled = true;
+                    SendMessage.IsEnabled = true;
+                    Bootload.IsEnabled = true;
                 }
                 else
-                    SendFile.IsEnabled = SendMessage.IsEnabled = false;
-                ConnectedDevices.ItemsSource = WIFIcofig.TCPclients;
-                
+                {
+                    Bootload.IsEnabled = SendMessage.IsEnabled = false;
+                    BootloaderView.Visibility = Visibility.Collapsed;
+                }                    
+                ConnectedDevices.ItemsSource = WIFIcofig.TCPclients;                
             }             
             else
             {
                 ConnectedDevicesCount.Content = "0";
                 WIFIcofig.SelectedIP = "";
-                SendFile.IsEnabled = SendMessage.IsEnabled = false;
+                SendMessage.IsEnabled = false;
+                Bootload.IsEnabled = false;
+                BootloaderView.Visibility = Visibility.Collapsed;
 
             }
                 
@@ -179,6 +184,11 @@ namespace WIFI_Config_App
         {
             WIFIcofig.Hotspot(null, null, false);
             Environment.Exit(Environment.ExitCode);
+        }
+
+        private void Bootload_Click(object sender, RoutedEventArgs e)
+        {
+            BootloaderView.Visibility = Visibility.Visible;
         }
     }
 }

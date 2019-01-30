@@ -44,7 +44,7 @@
                         <MenuItem x:Name="ParmHex_menu" Header="Export Parameters to a .mer file"   Height="50"/>
                         <MenuItem x:Name="ParmXML_menu" Header="Update Parameters in .xml file"   Height="50"/>
                         <MenuItem x:Name="CommisionTrue" Header="Set to Commission state"    Height="50"/>
-                        <MenuItem x:Name="Bootload" Header="Update firmware of connected device"   Height="50"/>
+                        <MenuItem x:Name="Bootload" Header="Update firmware of connected device"   Height="50" Click="Bootload_Click"/>
                     </MenuItem>
                 </Menu>
             </Grid>
@@ -52,12 +52,13 @@
             <!--<Button x:Name="ConnectBtn" Content="Create WIFI AP" Click="Button_Click" />
             <Button x:Name="CreateServer" Content="CreateTCPserver" Grid.Column="2" Click="CreateServer_Click"/>-->
             
+            
 
 
             <!--Row 1-->
             <Label Content="ServerStatus:" Grid.Row="1" Grid.Column="0"/>
             <Label x:Name="LblServerStatus" Grid.Row="1" Grid.Column="1"/>
-            
+
 
             <!--Row 2-->
             <DataGrid x:Name="lstLocal" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Width="340" IsReadOnly="True" AutoGenerateColumns="True"  SelectionChanged="LstLocal_SelectionChanged" ItemsSource="{Binding NetworkDevicesp}" CanUserAddRows="False" Visibility="Collapsed"/>
@@ -80,10 +81,13 @@
             <Label Grid.Row="4" Grid.Column="2" Content="Broadcast:"/>
             
             <!--row 5-->
-            <Button x:Name="SendFile" Content="Send File" Grid.Row="5"  Height="40" />
+            <Button x:Name="SelectFile" Content="Select File" Grid.Row="5"  Height="40" />
             <Viewbox Grid.Row="5" Grid.Column="2" Height="40">
                 <CheckBox x:Name="Broadcast"  Checked="Broadcast_Checked" Unchecked="Broadcast_Unchecked" />
             </Viewbox>
+
+
+            <local:Bootloader x:Name="BootloaderView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="10" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed" />
         </Grid>
     </Viewbox>
 </Window>
