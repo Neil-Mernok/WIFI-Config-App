@@ -16,7 +16,7 @@ using System.DirectoryServices;
 
 namespace WIFI_Config_App
 {
-    class WIFIcofig : INotifyPropertyChanged
+    public class WIFIcofig : INotifyPropertyChanged
     {
         // Thread signal.  
         public static ManualResetEvent allDone = new ManualResetEvent(false);
@@ -75,6 +75,7 @@ namespace WIFI_Config_App
             set { _broadCast = value; }
         }
 
+        public static bool CloseConnectAll { get; set; }
 
         public static string ServerStatus { get; set; }
 
@@ -84,9 +85,22 @@ namespace WIFI_Config_App
 
         public static int BootAckIndex { get; set; }
 
-        public static List<string> ServerMessage { get; set; }
+        private List<ClientMessage> _ServerMessage;
 
-        public static string ServerMessageSend { get; set; }
+        public List<ClientMessage> ServerMessage
+        {
+            get
+            {
+                return _ServerMessage;
+            }
+            set
+            {
+                _ServerMessage = value;
+                OnPropertyChanged("ServerMessage");
+            }
+        }
+
+        public static byte[] ServerMessageSend { get; set; }
 
         public  List<string> GetLocalIPAddress()
         {
@@ -177,6 +191,7 @@ namespace WIFI_Config_App
 
         public void serverRun()
         {
+            CloseConnectAll = false;
             Thread newThread = new Thread(new ThreadStart(StartServer));
             newThread.Start();            
         }
@@ -191,7 +206,7 @@ namespace WIFI_Config_App
 
         private void StartServer()
         {
-            ServerMessage = new List<string>();
+            ServerMessage = new List<ClientMessage>();
             SelectedIP = "";
             clients = new List<Socket>();
             try
@@ -201,11 +216,20 @@ namespace WIFI_Config_App
 
                 socket.Bind(ip); //Bind to the client's IP
                 socket.Listen(10); //Listen for maximum 10 connections
-               
+
                 Thread ClientsThread = new Thread(new ThreadStart(GetClients));
                 ClientsThread.IsBackground = true;
                 ClientsThread.Start();
 
+                while (!CloseConnectAll)
+                {
+                    
+                }
+                if (CloseConnectAll)
+                {
+                    socket.Close();
+                    ServerStatus = "Server disconnected...";
+                }
             }
             catch (SocketException e)
             {
@@ -231,13 +255,13 @@ namespace WIFI_Config_App
         private void GetClients()
         {
             int clientslot = 0;
-            ServerStatus = "Waiting for a client...";
-            Console.WriteLine("Waiting for a client...");
-            while (clientnum < 11)
+            ServerStatus = "Waiting for a client...";     
+
+            while (clientnum < 10)
             {
-                
+                Console.WriteLine("Waiting for a client...");
                 try
-                {                   
+                {
                     client = socket.Accept();
                     clients.Add(client);
                     IPEndPoint clientep = (IPEndPoint)clients[clientnum].RemoteEndPoint;
@@ -261,10 +285,12 @@ namespace WIFI_Config_App
                     Console.WriteLine("Client connection failed...");
                     ServerStatus = "Client connection failed...";
                 }
-                
-            }
+
+            }           
+
             Console.WriteLine("Maximum amount of clients reached!");
             ServerStatus = "Maximum amount of clients reached!";
+            
         }
 
         private void RecieveBytes(EndPoint clientnumr)
@@ -273,15 +299,16 @@ namespace WIFI_Config_App
             {
                 List<Socket> clientR = clients.Where(t => t.RemoteEndPoint == clientnumr).ToList();
                 byte[] data2 = new byte[522];
-                while (!clientR[0].Poll(10, SelectMode.SelectRead))
+                while (!clientR[0].Poll(10, SelectMode.SelectRead) && !CloseConnectAll) 
                 {
                 
                     if ((i = clientR[0].Receive(data2, data2.Length, SocketFlags.None)) != 0)
                     {
-                        string recmeg = Encoding.ASCII.GetString(data2, 0, i);
-                        Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint);
+                        string recmeg = Encoding.UTF8.GetString(data2, 0, i);
+                        Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint +" Index: " + BootAckIndex.ToString());
                         ServerStatus = "Received: " + recmeg + " from: " + clientR[0].RemoteEndPoint;
-                        ServerMessage.Add(recmeg + "from:" + clientR[0].RemoteEndPoint);
+                        //ServerMessage.Add(recmeg + " from: " + clientR[0].RemoteEndPoint);
+                        //ServerMessage.Add(new ClientMessage() { DeviceIP = clientR[0].RemoteEndPoint.ToString(), Message = recmeg });
                         //WiFimessages.Parse(data2, clientnumr);
                         bootloader.BootloaderParse(data2, clientnumr);
 
@@ -307,19 +334,19 @@ namespace WIFI_Config_App
             List<Socket> clientR = clients.Where(t => t.RemoteEndPoint == clientnumr).ToList();
             clientR[0].Send(data, data.Length, SocketFlags.None); //Send the data to the client
             
-            while (!clientR[0].Poll(10, SelectMode.SelectRead))
+            while (!clientR[0].Poll(10, SelectMode.SelectRead) && !CloseConnectAll)
             {
                 try
                 {
                     clientR = clients.Where(t => t.RemoteEndPoint == clientnumr).ToList();
-                    if ((SelectedIP == clientnumr.ToString() || BroadCast == true) && ServerMessageSend != null && ServerMessageSend != "")
+                    if ((SelectedIP == clientnumr.ToString() || BroadCast == true) && ServerMessageSend != null && ServerMessageSend != null)
                     {
-                        data = Encoding.ASCII.GetBytes(ServerMessageSend);
+                        data = ServerMessageSend;
                         // Send back a response.
                         clientR[0].Send(data, data.Length, SocketFlags.None); //Send the data to the client
-                        ServerStatus = "Sent: " + ServerMessageSend + " to " + clientR[0].RemoteEndPoint;
-                        Console.WriteLine("Sent: {0}", ServerMessageSend);
-                        ServerMessageSend = "";
+                        //ServerStatus = "Sent: " + ServerMessageSend + " to " + clientR[0].RemoteEndPoint;
+                        Console.WriteLine("Sent: {0}", Encoding.UTF8.GetString(ServerMessageSend));
+                        ServerMessageSend = null;
                     }
                 }
                 catch
@@ -445,4 +472,32 @@ namespace WIFI_Config_App
 
     }
 
+    public class ClientMessage : INotifyPropertyChanged
+    {
+        #region OnProperty Changed
+        /////////////////////////////////////////////////////////////
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        /////////////////////////////////////////////////////////////
+        #endregion
+
+        private string _deviceIP;
+
+        public string DeviceIP
+        {
+            get { return _deviceIP; }
+            set { _deviceIP = value; OnPropertyChanged("DeviceIP"); }
+        }
+
+        private string _Message;
+
+        public string Message
+        {
+            get { return _Message; }
+            set { _Message = value; OnPropertyChanged("Message"); }
+        }
+    }
 }

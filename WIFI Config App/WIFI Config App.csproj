@@ -78,10 +78,27 @@
     <Compile Include="Bootloader.xaml.cs">
       <DependentUpon>Bootloader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ConfigureView.xaml.cs">
+      <DependentUpon>ConfigureView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataView.xaml.cs">
+      <DependentUpon>DataView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Devices.cs" />
+    <Compile Include="StartUpView.xaml.cs">
+      <DependentUpon>StartUpView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WIFIcofig.cs" />
     <Compile Include="WiFimessages.cs" />
     <Page Include="Bootloader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ConfigureView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -97,6 +114,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="StartUpView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

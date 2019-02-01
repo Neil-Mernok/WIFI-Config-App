@@ -5,19 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WIFI_Config_App"
         mc:Ignorable="d"
-        Title="MainWindow" Height="768" Width="1024" Closing="Window_Closing" Loaded="Window_Loaded" FontSize="20" FontFamily="Arial Black">
+        Title="MainWindow" Height="768" Width="1024" Closing="Window_Closing" Loaded="Window_Loaded" FontSize="30" FontFamily="Arial Black">
 
     <Viewbox Stretch="Fill">
         <Grid Height="768" Width="1054" Opacity="100" Background="White">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>  <!--0-->
+                <RowDefinition Height="auto"/>  <!--1-->
+                <RowDefinition Height="auto"/>  <!--2-->
+                <RowDefinition Height="auto"/>  <!--3-->
+                <RowDefinition Height="auto"/>  <!--4-->
+                <RowDefinition Height="auto"/>  <!--5-->
+                <RowDefinition Height="auto"/>  <!--6-->
+                <RowDefinition Height="auto"/>  <!--7-->
+                <RowDefinition Height="auto"/>  <!--8-->
+                <RowDefinition Height="auto"/>  <!--9-->
+                <RowDefinition Height="*"/>     <!--10-->
+                <RowDefinition Height="auto"/>  <!--11-->
+                <RowDefinition Height="150"/>   <!--12-->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -35,6 +40,7 @@
                 <Menu x:Name="menu" Height="50"  HorizontalAlignment="Stretch" FontSize="20" FontFamily="Arial Black">
                     <MenuItem Header="File" Height="50" Width="53" >
                         <MenuItem x:Name="MenuTWifiAP" Header="Create/Stop Wifi Access point" Click="Button_Click"  Height="50"/>
+                        <MenuItem x:Name="RestartServer" Header="Restart TCP Server" Height="50" Click="RestartServer_Click"/>
                         <MenuItem  Header="Exit application"   Height="50" Click="MenuItem_Click"/>
                     </MenuItem>
                     <MenuItem x:Name="AboutMenu" Header="About" Click="AboutMenu_Click"/>
@@ -56,25 +62,21 @@
 
 
             <!--Row 1-->
-            <Label Content="ServerStatus:" Grid.Row="1" Grid.Column="0"/>
-            <Label x:Name="LblServerStatus" Grid.Row="1" Grid.Column="1"/>
+            <Label Content="ServerStatus:" Grid.Row="1" Grid.Column="0" />
+            <Label x:Name="LblServerStatus" Grid.Row="1" Grid.Column="1" Content="{Binding WIFIcofig.ServerStatus}"/>
 
 
-            <!--Row 2-->
-            <DataGrid x:Name="lstLocal" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Width="340" IsReadOnly="True" AutoGenerateColumns="True"  SelectionChanged="LstLocal_SelectionChanged" ItemsSource="{Binding NetworkDevicesp}" CanUserAddRows="False" Visibility="Collapsed"/>
-            <Label x:Name="LocalIpsCount" Grid.Row="2" Grid.Column="2"/>
+            <!--Row 2-->            
             <Label Content="Connected Devices:" Grid.Row="2" Grid.Column="1"/>
-            <Label x:Name="selectedIP" Grid.Row="6" Grid.Column="1"/>
+            <Label x:Name="ConnectedDevicesCount" Grid.Row="2" Grid.Column="2"/>
             
-
-
+            
 
             <!--row 3-->
-            <Label x:Name="ConnectedDevicesCount" Grid.Row="2" Grid.Column="2"/>
+            
             <Button x:Name="SendMessage" Content="Send Message" Grid.Row="3" Click="SendMessage_Click" Height="40"/>
-            <DataGrid x:Name="ConnectedDevices" Grid.Row="3" Grid.RowSpan="3" Grid.Column="1" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True" ItemsSource="{Binding TCPclients}" SelectionChanged="ConnectedDevices_SelectionChanged"/>
-            
-            
+            <DataGrid x:Name="ConnectedDevices" Grid.Row="3" Grid.RowSpan="3" Grid.Column="1" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True" ItemsSource="{Binding WIFIcofig.TCPclients}" SelectionChanged="ConnectedDevices_SelectionChanged"/>
+                      
             
             <!--row 4-->
             <TextBox x:Name="SendmessageTextB" Grid.Row="4"  Height="40"/>
@@ -85,9 +87,24 @@
             <Viewbox Grid.Row="5" Grid.Column="2" Height="40">
                 <CheckBox x:Name="Broadcast"  Checked="Broadcast_Checked" Unchecked="Broadcast_Unchecked" />
             </Viewbox>
+            
+            <!--row6-->
+            <Label x:Name="selectedIP" Grid.Row="6" Grid.Column="1"/>
 
+            <Label x:Name="BindingTest" Grid.Row="6" Content="{Binding bindingTester.BindingT}"/>
+            
+            <!--row7-->
+            <DataGrid x:Name="RecievedMessages" Grid.Row="7" Grid.Column="1" Grid.RowSpan="4" ItemsSource="{Binding WIFIcofig.ServerMessage}" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True"/>
+            <!--<Label x:Name="RecievedMessagesCount" Grid.Row="7" Grid.Column="2" Grid.RowSpan="4"/>-->
 
-            <local:Bootloader x:Name="BootloaderView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="10" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed" />
+            <!--row11-->
+            <Label x:Name="LocalIpsCount" Grid.Row="11" Grid.Column="1"/>
+            <Label Content="Available network devices:" Grid.Row="11" Grid.Column="0"/>
+            <DataGrid x:Name="lstLocal" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="3"  IsReadOnly="True" AutoGenerateColumns="True"  SelectionChanged="LstLocal_SelectionChanged" ItemsSource="{Binding WIFIcofig.NetworkDevicesp}" CanUserAddRows="False" />
+            <local:StartUpView x:Name="StartUpView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Visible"/>
+            <local:DataView x:Name="DataView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed"/>
+            <local:ConfigureView x:Name="ConfigureView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed"/>
+            <local:Bootloader x:Name="BootloaderView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed" />
         </Grid>
     </Viewbox>
 </Window>

@@ -22,7 +22,7 @@ namespace WIFI_Config_App
         public int Firmware_Number = 0;
         public byte[] CommanderName = new byte[20];
 
-        public string DateString, LicDateString;
+        public string DateString;//, LicDateString;
         public string TimeString;
         public string SecondString;
         public string Local_date, Local_time;
@@ -78,7 +78,7 @@ namespace WIFI_Config_App
                 {
                     WIFIcofig.BroadCast = false;
                     WIFIcofig.SelectedIP = clientnumr.ToString();
-                    WIFIcofig.ServerMessageSend = AcknowledgeSMessage;
+                    WIFIcofig.ServerMessageSend = Encoding.ASCII.GetBytes(AcknowledgeSMessage);
                     CommsEstablished = true;
                     //Console.WriteLine("Heartbeat recieved");
                     if (recData[3] == 1)
@@ -113,7 +113,7 @@ namespace WIFI_Config_App
                        // MainWindow.AppWindow.Dispatcher.Invoke(() => MainWindow.AppWindow.DateBorder.Background = Brushes.MediumVioletRed);
                     }
 
-                    string LicenceType = "";
+                    //string LicenceType = "";
 
 
                     // char[] LicenceNameChar = new char[20];
@@ -162,7 +162,7 @@ namespace WIFI_Config_App
                 if (recData[2] == 'm')
                 {
                     minPackageAKN = true;
-                    WIFIcofig.ServerMessageSend = AcknowledgeSMessage;
+                    WIFIcofig.ServerMessageSend = Encoding.ASCII.GetBytes(AcknowledgeSMessage);
                     //SendSerialString(AcknowledgeSMessage);
                     //Console.WriteLine("========================");
                     //Console.WriteLine("goodpackage MIn recieved");
@@ -185,7 +185,7 @@ namespace WIFI_Config_App
                 if (recData[2] == 'M')
                 {
                     maxPackageAKN = true;
-                    WIFIcofig.ServerMessageSend = AcknowledgeSMessage;
+                    WIFIcofig.ServerMessageSend = Encoding.ASCII.GetBytes(AcknowledgeSMessage);
                     //SendSerialString(AcknowledgeSMessage);
                     //Console.WriteLine("========================");
                     //Console.WriteLine("goodpackage Max recieved");

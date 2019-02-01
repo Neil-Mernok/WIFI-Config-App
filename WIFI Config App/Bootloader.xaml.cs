@@ -25,7 +25,7 @@ namespace WIFI_Config_App
     /// </summary>
     public partial class Bootloader : UserControl
     {
-        string bootfile = "";
+        //string bootfile = "";
         byte[] bootfilebytes;
         int bootfileSize = 0;
         int bootchunks = 0;
@@ -39,34 +39,37 @@ namespace WIFI_Config_App
             InitializeComponent();
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
             dispatcherTimer.Start();
+            FileSelect_Click(null, null);
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if(bootchunks>0)
-                ProgBoot.Value = WIFIcofig.BootSentIndex / bootchunks * 1000;
+            if(bootchunks>0 && WIFIcofig.BootSentIndex> 1)
+                ProgBoot.Value = WIFIcofig.BootSentIndex / (double) bootchunks * 1000;
         }
 
         private void FileSelect_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
-                bootfilebytes = File.ReadAllBytes(openFileDialog.FileName);
+            //OpenFileDialog openFileDialog = new OpenFileDialog();
+            //if (openFileDialog.ShowDialog() == true)
+            //    bootfilebytes = File.ReadAllBytes(openFileDialog.FileName);
 
-            txtEditor.Text = openFileDialog.FileName;
+            bootfilebytes = File.ReadAllBytes("D:\\Users\\NeilPretorius\\Desktop\\V14 2\\TITAN VISION - V14\\ME-VISION-L4-PFW\\Debug\\ME-VISION-L4-PFW.binary");
 
-            bootfile = openFileDialog.FileName;
+ //           txtEditor.Text = openFileDialog.FileName;
 
-            int fileChunck = 1014;
+            //bootfile = openFileDialog.FileName;
+
+            int fileChunck = 512;
 
             bytesleft = bootfileSize = bootfilebytes.Length;
             bootchunks = (int)Math.Round(bootfileSize / (double)fileChunck);
             int shifter = 0;
-            for (int i = 0; i < bootchunks; i++)
+            for (int i = 0; i <= bootchunks; i++)
             {
-                byte[] bootchunk = Enumerable.Repeat((byte)0xFF, 1024).ToArray();
+                byte[] bootchunk = Enumerable.Repeat((byte)0xFF, 522).ToArray();
                 byte[] bytes = BitConverter.GetBytes(i);
                 byte[] bytes2 = BitConverter.GetBytes(bootchunks);
                 bootchunk[0] = (byte)'[';
@@ -82,30 +85,33 @@ namespace WIFI_Config_App
                 else if(bytesleft>0)
                     Array.Copy(bootfilebytes, shifter, bootchunk, 7, bytesleft);
 
-                bootchunk[1021] = 0;
-                bootchunk[1022] = 0;
-                bootchunk[1023] = (byte)']';
+                bootchunk[519] = 0;
+                bootchunk[520] = 0;
+                bootchunk[521] = (byte)']';
                 BootFileList.Add(bootchunk);
                 shifter += fileChunck;
                 bytesleft -= fileChunck;
             }
 
-            WIFIcofig.BootSentIndex = 0;
-            WIFIcofig.BootAckIndex = -1;
+            
         }
 
         private void BootExit_Click(object sender, RoutedEventArgs e)
         {
-            this.Visibility = Visibility.Collapsed;
+            ProgramFlow.ProgramWindow = (int)ProgramFlowE.Startup;
         }
 
         private void Bootload_Click(object sender, RoutedEventArgs e)
         {
+            
+            WIFIcofig.BootSentIndex = 0;
+            WIFIcofig.BootAckIndex = -1;
+
             Thread BootloaderThread = new Thread(BootloaderDo);
             BootloaderThread.IsBackground = true;
             BootloaderThread.Start();
 
-            WIFIcofig.ServerMessageSend = "[&BB00]";
+            WIFIcofig.ServerMessageSend = Encoding.ASCII.GetBytes("[&BB00]");
         }
 
         private void BootloaderDo()
@@ -117,14 +123,23 @@ namespace WIFI_Config_App
                     
                     if (WIFIcofig.BootSentIndex == 0 && WIFIcofig.BootAckIndex == -1)
                     {
-                        WIFIcofig.ServerMessageSend = Encoding.ASCII.GetString(BootFileList.ElementAt(WIFIcofig.BootSentIndex));
+                        WIFIcofig.ServerMessageSend = BootFileList.ElementAt(WIFIcofig.BootSentIndex);
                         WIFIcofig.BootSentIndex++;
                     }
 
                     if(WIFIcofig.BootSentIndex<BootFileList.Count && WIFIcofig.BootAckIndex == WIFIcofig.BootSentIndex-1)
                     {
-                        WIFIcofig.ServerMessageSend = Encoding.ASCII.GetString(BootFileList.ElementAt(WIFIcofig.BootSentIndex));
+                        Thread.Sleep(10);
+                        WIFIcofig.ServerMessageSend = BootFileList.ElementAt(WIFIcofig.BootSentIndex);
                         WIFIcofig.BootSentIndex++;
+                    }
+
+                    if(WIFIcofig.BootSentIndex == BootFileList.Count)
+                    {
+                        Console.WriteLine("====================Bootloading done======================");
+                        //WIFIcofig.ServerMessageSend = 
+                        WIFIcofig.BootReady = false;
+                        break;
                     }
                 }
 
@@ -134,7 +149,7 @@ namespace WIFI_Config_App
 
         public void BootloaderParse(byte[] message, EndPoint endPoint)
         {
-            if ((message.Length >= 1024) && (message[0] == '[') && (message[1] == '&')) //
+            if ((message.Length >= 7) && (message[0] == '[') && (message[1] == '&')) //
             {
                 if (message[2] == 'B')
                 {
@@ -151,12 +166,16 @@ namespace WIFI_Config_App
                     }
 
 
-                    if (message[3] == 'a' && message[8] == ']')
+                    if (message[3] == 'a' && (message[8] == ']' || message[9] == ']'))
                     {
-                        WIFIcofig.BootAckIndex = BitConverter.ToInt16(message, 4);
+                        WIFIcofig.BootAckIndex = BitConverter.ToUInt16(message, 4);
 
                     }
                         
+                }
+                else if(message[2] == 'h' /*&& message.Length == 522*/)
+                {
+                    Console.WriteLine("====================heartbeat recieved======================");
                 }
             }
         }
