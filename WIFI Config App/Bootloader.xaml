@@ -25,5 +25,7 @@
 
         <TextBox Name="txtEditor" Grid.Column="1"  Grid.RowSpan="3" TextWrapping="Wrap"/>
         <ProgressBar Name="ProgBoot" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Height="50" Maximum="1000" Minimum="1" Background="Black" Foreground="White"/>
+        <Label x:Name="BootStatusLbl" HorizontalAlignment="Stretch" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Top" Content="{Binding BootStatus}"/>
+        <DataGrid x:Name="DGDevicesSocket" Grid.Column="1" HorizontalAlignment="Stretch" Height="100" Margin="0,90,0,0" Grid.Row="3" VerticalAlignment="Top" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True"/>
     </Grid>
 </UserControl>

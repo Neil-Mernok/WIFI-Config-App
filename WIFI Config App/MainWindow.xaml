@@ -10,19 +10,32 @@
     <Viewbox Stretch="Fill">
         <Grid Height="768" Width="1054" Opacity="100" Background="White">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>  <!--0-->
-                <RowDefinition Height="auto"/>  <!--1-->
-                <RowDefinition Height="auto"/>  <!--2-->
-                <RowDefinition Height="auto"/>  <!--3-->
-                <RowDefinition Height="auto"/>  <!--4-->
-                <RowDefinition Height="auto"/>  <!--5-->
-                <RowDefinition Height="auto"/>  <!--6-->
-                <RowDefinition Height="auto"/>  <!--7-->
-                <RowDefinition Height="auto"/>  <!--8-->
-                <RowDefinition Height="auto"/>  <!--9-->
-                <RowDefinition Height="*"/>     <!--10-->
-                <RowDefinition Height="auto"/>  <!--11-->
-                <RowDefinition Height="150"/>   <!--12-->
+                <RowDefinition Height="auto"/>
+                <!--0-->
+                <RowDefinition Height="auto"/>
+                <!--1-->
+                <RowDefinition Height="auto"/>
+                <!--2-->
+                <RowDefinition Height="auto"/>
+                <!--3-->
+                <RowDefinition Height="auto"/>
+                <!--4-->
+                <RowDefinition Height="auto"/>
+                <!--5-->
+                <RowDefinition Height="auto"/>
+                <!--6-->
+                <RowDefinition Height="auto"/>
+                <!--7-->
+                <RowDefinition Height="auto"/>
+                <!--8-->
+                <RowDefinition Height="auto"/>
+                <!--9-->
+                <RowDefinition Height="*"/>
+                <!--10-->
+                <RowDefinition Height="auto"/>
+                <!--11-->
+                <RowDefinition Height="150"/>
+                <!--12-->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -54,11 +67,11 @@
                     </MenuItem>
                 </Menu>
             </Grid>
-            
+
             <!--<Button x:Name="ConnectBtn" Content="Create WIFI AP" Click="Button_Click" />
             <Button x:Name="CreateServer" Content="CreateTCPserver" Grid.Column="2" Click="CreateServer_Click"/>-->
-            
-            
+
+
 
 
             <!--Row 1-->
@@ -66,45 +79,45 @@
             <Label x:Name="LblServerStatus" Grid.Row="1" Grid.Column="1" Content="{Binding WIFIcofig.ServerStatus}"/>
 
 
-            <!--Row 2-->            
+            <!--Row 2-->
             <Label Content="Connected Devices:" Grid.Row="2" Grid.Column="1"/>
-            <Label x:Name="ConnectedDevicesCount" Grid.Row="2" Grid.Column="2"/>
-            
-            
+            <Label x:Name="ConnectedDevicesCount" Grid.Row="2" Grid.Column="3"/>
+
+
 
             <!--row 3-->
-            
+
             <Button x:Name="SendMessage" Content="Send Message" Grid.Row="3" Click="SendMessage_Click" Height="40"/>
-            <DataGrid x:Name="ConnectedDevices" Grid.Row="3" Grid.RowSpan="3" Grid.Column="1" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True" ItemsSource="{Binding WIFIcofig.TCPclients}" SelectionChanged="ConnectedDevices_SelectionChanged"/>
-                      
-            
+            <DataGrid x:Name="ConnectedDevices" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Grid.Column="1" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True" ItemsSource="{Binding WIFIcofig.TCPclients}" SelectionChanged="ConnectedDevices_SelectionChanged"/>
+
+
             <!--row 4-->
             <TextBox x:Name="SendmessageTextB" Grid.Row="4"  Height="40"/>
-            <Label Grid.Row="4" Grid.Column="2" Content="Broadcast:"/>
-            
+            <Label Grid.Row="6" Grid.Column="2" Content="Broadcast:"/>
+
             <!--row 5-->
             <Button x:Name="SelectFile" Content="Select File" Grid.Row="5"  Height="40" />
-            <Viewbox Grid.Row="5" Grid.Column="2" Height="40">
+            <Viewbox Grid.Row="10" Grid.Column="2" Height="40" Margin="0,19,0,213">
                 <CheckBox x:Name="Broadcast"  Checked="Broadcast_Checked" Unchecked="Broadcast_Unchecked" />
             </Viewbox>
-            
+
             <!--row6-->
-            <Label x:Name="selectedIP" Grid.Row="6" Grid.Column="1"/>
+            <Label x:Name="selectedIP" Grid.Row="6" Grid.Column="1" Content="{Binding WIFIcofig.SelectedIP}"/>
 
             <Label x:Name="BindingTest" Grid.Row="6" Content="{Binding bindingTester.BindingT}"/>
-            
-            <!--row7-->
-            <DataGrid x:Name="RecievedMessages" Grid.Row="7" Grid.Column="1" Grid.RowSpan="4" ItemsSource="{Binding WIFIcofig.ServerMessage}" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="True"/>
-            <!--<Label x:Name="RecievedMessagesCount" Grid.Row="7" Grid.Column="2" Grid.RowSpan="4"/>-->
 
+            <Label x:Name="heartBeatlbl" Content="HB mess" HorizontalAlignment="Left" Grid.Row="10" VerticalAlignment="Top" />
             <!--row11-->
             <Label x:Name="LocalIpsCount" Grid.Row="11" Grid.Column="1"/>
             <Label Content="Available network devices:" Grid.Row="11" Grid.Column="0"/>
+            <Label x:Name="WiFiApStatus" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" Grid.Row="11" VerticalAlignment="Stretch"/>
             <DataGrid x:Name="lstLocal" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="3"  IsReadOnly="True" AutoGenerateColumns="True"  SelectionChanged="LstLocal_SelectionChanged" ItemsSource="{Binding WIFIcofig.NetworkDevicesp}" CanUserAddRows="False" />
-            <local:StartUpView x:Name="StartUpView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Visible"/>
+            <local:StartUpView x:Name="StartUpView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed"/>
             <local:DataView x:Name="DataView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed"/>
             <local:ConfigureView x:Name="ConfigureView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed"/>
             <local:Bootloader x:Name="BootloaderView" HorizontalAlignment="Stretch"  Grid.Row="1" Grid.RowSpan="20" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Stretch" Visibility="Collapsed" />
+
+
         </Grid>
     </Viewbox>
 </Window>

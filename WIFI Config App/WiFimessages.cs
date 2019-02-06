@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WIFI_Config_App
 {
-    class WiFimessages
+    public class WiFimessages
     {
 
         public static CommanderParameterFile CommanderParameterFile = new CommanderParameterFile();

@@ -14,8 +14,7 @@ namespace WIFI_Config_App
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         protected bool SetField<T>(ref T field, T value, string propertyName)
         {
@@ -35,7 +34,7 @@ namespace WIFI_Config_App
         public UInt32 _UID;
         public int times_seen;
 
-        public static UInt32 parse_message_UID(byte[] data)
+        public static UInt32 Parse_message_UID(byte[] data)
         {
             if (data.Length > 5)
                 return BitConverter.ToUInt32(data, 1);
@@ -73,7 +72,7 @@ namespace WIFI_Config_App
         public string Device_Name { get { return _Device_Name; } set { SetField(ref _Device_Name, value, "Device_Name"); } }
 
 
-        public void updateAll()
+        public void UpdateAll()
         {
             OnPropertyChanged(null);
         }
@@ -93,7 +92,7 @@ namespace WIFI_Config_App
             {
                 if (message[0] == (byte)'i')
                 {
-                    UInt32 UID = parse_message_UID(message);
+                    UInt32 UID = Parse_message_UID(message);
                     if (UID != 0)
                     {
 
@@ -105,7 +104,7 @@ namespace WIFI_Config_App
                         else
                             found = true;
 
-                        T.parse_message_into_Device(message);
+                        T.Parse_message_into_Device(message);
                         if ((found == false) && (UID != 0))
                         {
                             Device_collection.Add(T);
@@ -117,10 +116,10 @@ namespace WIFI_Config_App
             }
         }
 
-        public void parse_message_into_Device(byte[] data)
+        public void Parse_message_into_Device(byte[] data)
         {
             int PacketSize = 39;
-            SetField(ref _UID, parse_message_UID(data), "UID");
+            SetField(ref _UID, Parse_message_UID(data), "UID");
 
 
             if ((data.Length >= PacketSize) && ((data[0] == 'P') || (data[0] == 'A')))

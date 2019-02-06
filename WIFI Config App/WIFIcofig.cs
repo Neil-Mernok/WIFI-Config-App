@@ -19,7 +19,6 @@ namespace WIFI_Config_App
     public class WIFIcofig : INotifyPropertyChanged
     {
         // Thread signal.  
-        public static ManualResetEvent allDone = new ManualResetEvent(false);
         public TcpListener server = null;
         #region OnProperty Changed
         /////////////////////////////////////////////////////////////
@@ -45,6 +44,8 @@ namespace WIFI_Config_App
                 OnPropertyChanged("NetworkDevicesp");
             }
         }
+
+        private int prevCount;
         private List<TCPclient> _TCPclients;
         public List<TCPclient> TCPclients
         {
@@ -59,33 +60,9 @@ namespace WIFI_Config_App
             }
         }
 
-        private static string _selectedIP;
-
-        public static string SelectedIP
-        {
-            get { return _selectedIP; }
-            set { _selectedIP = value; }
-        }
-
-        private static bool _broadCast;
-
-        public static bool BroadCast
-        {
-            get { return _broadCast; }
-            set { _broadCast = value; }
-        }
-
-        public static bool CloseConnectAll { get; set; }
-
-        public static string ServerStatus { get; set; }
-
-        public static bool BootReady { get; set; }
-
-        public static int BootSentIndex { get; set; }
-
-        public static int BootAckIndex { get; set; }
-
         private List<ClientMessage> _ServerMessage;
+
+        public static List<ClientMessage> ServerMessagges = new List<ClientMessage>();
 
         public List<ClientMessage> ServerMessage
         {
@@ -99,6 +76,30 @@ namespace WIFI_Config_App
                 OnPropertyChanged("ServerMessage");
             }
         }
+
+        private static string _selectedIP;
+
+        public static string SelectedIP
+        {
+            get { return _selectedIP; }
+            set { _selectedIP = value; }
+        }
+
+        public static string WiFiApStatus { get; set; } 
+
+        private static bool _broadCast;
+
+        public static bool BroadCast
+        {
+            get { return _broadCast; }
+            set { _broadCast = value; }
+        }
+
+        public static bool CloseConnectAll { get; set; }
+
+        public static string ServerStatus { get; set; }
+
+        public static string BootStatus { get; set; }
 
         public static byte[] ServerMessageSend { get; set; }
 
@@ -149,11 +150,13 @@ namespace WIFI_Config_App
 
         public void Hotspot(string ssid, string key, bool status)
         {
-            ProcessStartInfo processStartInfo = new ProcessStartInfo("cmd.exe");
-            processStartInfo.RedirectStandardInput = true;
-            processStartInfo.RedirectStandardOutput = true;
-            processStartInfo.CreateNoWindow = true;
-            processStartInfo.UseShellExecute = false;
+            ProcessStartInfo processStartInfo = new ProcessStartInfo("cmd.exe")
+            {
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
             Process process = Process.Start(processStartInfo);
 
             if (process != null)
@@ -183,13 +186,18 @@ namespace WIFI_Config_App
             while(true)
             {
                 GetAllLocalIPv4(NetworkInterfaceType.Ethernet);
-                NetworkDevicesp = NetworkDevices;              
+                if(NetworkDevices.Count != prevCount)
+                {
+                    NetworkDevicesp = NetworkDevices;
+                    prevCount = NetworkDevices.Count;
+                }
+                             
             }
             
         }
 
 
-        public void serverRun()
+        public void ServerRun()
         {
             CloseConnectAll = false;
             Thread newThread = new Thread(new ThreadStart(StartServer));
@@ -200,13 +208,12 @@ namespace WIFI_Config_App
         Socket socket;
         Socket client;
         public static List<Socket> clients;
-
-        WiFimessages WiFimessages = new WiFimessages();
+        //public static WiFimessages WiFimessages = new WiFimessages();
         Bootloader bootloader = new Bootloader();
 
         private void StartServer()
         {
-            ServerMessage = new List<ClientMessage>();
+            server = null;
             SelectedIP = "";
             clients = new List<Socket>();
             try
@@ -217,8 +224,10 @@ namespace WIFI_Config_App
                 socket.Bind(ip); //Bind to the client's IP
                 socket.Listen(10); //Listen for maximum 10 connections
 
-                Thread ClientsThread = new Thread(new ThreadStart(GetClients));
-                ClientsThread.IsBackground = true;
+                Thread ClientsThread = new Thread(new ThreadStart(GetClients))
+                {
+                    IsBackground = true
+                };
                 ClientsThread.Start();
 
                 while (!CloseConnectAll)
@@ -249,6 +258,7 @@ namespace WIFI_Config_App
             }
 
             TCPclients = TCPclientsdumm;
+            
         }
 
         private int clientnum = 0;
@@ -270,12 +280,16 @@ namespace WIFI_Config_App
                     ServerStatus = "Connected with " + clientep.Address + " at port" + clientep.Port;
                     ClientLsitChanged();
 
-                    Thread readThread = new Thread(() => RecieveBytes(client.RemoteEndPoint));
-                    readThread.IsBackground = true;
+                    Thread readThread = new Thread(() => RecieveBytes(client.RemoteEndPoint))
+                    {
+                        IsBackground = true
+                    };
                     readThread.Start();
                     clientslot = clientnum;
-                    Thread sendThread = new Thread(() => SendBytes(client.RemoteEndPoint, clientslot));
-                    sendThread.IsBackground = true;
+                    Thread sendThread = new Thread(() => SendBytes(client.RemoteEndPoint, clientslot))
+                    {
+                        IsBackground = true
+                    };
                     sendThread.Start();
 
                     clientnum++;
@@ -305,15 +319,16 @@ namespace WIFI_Config_App
                     if ((i = clientR[0].Receive(data2, data2.Length, SocketFlags.None)) != 0)
                     {
                         string recmeg = Encoding.UTF8.GetString(data2, 0, i);
-                        Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint +" Index: " + BootAckIndex.ToString());
+                        Console.WriteLine("Received:" + recmeg + " from: " + clientR[0].RemoteEndPoint +" Index: " + Bootloader.BootAckIndex.ToString());
                         ServerStatus = "Received: " + recmeg + " from: " + clientR[0].RemoteEndPoint;
                         //ServerMessage.Add(recmeg + " from: " + clientR[0].RemoteEndPoint);
-                        //ServerMessage.Add(new ClientMessage() { DeviceIP = clientR[0].RemoteEndPoint.ToString(), Message = recmeg });
+                        ServerMessagges.Add(new ClientMessage() { DeviceIP = clientR[0].RemoteEndPoint.ToString(), Message = recmeg });
                         //WiFimessages.Parse(data2, clientnumr);
                         bootloader.BootloaderParse(data2, clientnumr);
 
                         data2 = new byte[522];
-                    }                              
+                    }
+                   
                 }
                 Console.WriteLine("-------------- {0} closed recieve", clientnumr);
             }
@@ -341,6 +356,7 @@ namespace WIFI_Config_App
                     clientR = clients.Where(t => t.RemoteEndPoint == clientnumr).ToList();
                     if ((SelectedIP == clientnumr.ToString() || BroadCast == true) && ServerMessageSend != null && ServerMessageSend != null)
                     {
+                        data = new byte[ServerMessageSend.Length];
                         data = ServerMessageSend;
                         // Send back a response.
                         clientR[0].Send(data, data.Length, SocketFlags.None); //Send the data to the client
@@ -369,7 +385,7 @@ namespace WIFI_Config_App
     {
         const ushort poly = 0x1021;
         ushort[] table = new ushort[256];
-        ushort initialValue = 0;
+        readonly ushort initialValue = 0;
 
         public ushort ComputeChecksum(byte[] bytes)
         {

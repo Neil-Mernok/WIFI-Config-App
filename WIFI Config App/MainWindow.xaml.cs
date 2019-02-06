@@ -37,6 +37,7 @@ namespace WIFI_Config_App
         public List<string> LocalIps = new List<string>();            
 
         BindingTester bindingTester = new BindingTester() { BindingT = 1 };
+        Bootloader Bootloader = new Bootloader();
         WIFIcofig WIFIcofig = new WIFIcofig();
         private DispatcherTimer dispatcherTimer;
         private DispatcherTimer dispatcherTimer2;
@@ -45,62 +46,77 @@ namespace WIFI_Config_App
         {
             InitializeComponent();
 
-            this.DataContext = new
+            DataContext = new
             {
                 bindingTester,
                 WIFIcofig,
             };
 
-            WIFIcofig.ServerStatus = "Disconnected";
+            WIFIcofig.ServerStatus = "Disconnected";            
             WIFIcofig.IpWatcherStart();
+            WIFIcofig.ServerMessage = new List<ClientMessage>();
 
             CreateServer_Click(null, null);
 
+            Button_Click(null, null);
+
             //  DispatcherTimer setup
             dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Tick += new EventHandler(WindowUpdateTimer);
             dispatcherTimer.Interval = new TimeSpan(0, 0,0,0, 300);
             dispatcherTimer.Start();
 
 
             dispatcherTimer2 = new DispatcherTimer();
-            dispatcherTimer2.Tick += new EventHandler(dispatcherTimer_Tick2);
+            dispatcherTimer2.Tick += new EventHandler(HeatBeatTimer);
             dispatcherTimer2.Interval = new TimeSpan(0, 0, 0, 0, 500);
             dispatcherTimer2.Start();
         }
 
-        private void dispatcherTimer_Tick2(object sender, EventArgs e)
+        private void HeatBeatTimer(object sender, EventArgs e)
         {
-            if (!WIFIcofig.BootReady)
+            if (!Bootloader.BootReady)
             {
                 heartBeatMess[0] = (byte)'[';
                 heartBeatMess[1] = (byte)'&';
                 heartBeatMess[2] = (byte)'h';
                 heartBeatMess[3] = (byte)'h';
+                heartBeatMess[4] = (byte)'e';
+                heartBeatMess[5] = (byte)'a';
+                heartBeatMess[6] = (byte)'r';
+                heartBeatMess[7] = (byte)'t';
+                heartBeatMess[8] = (byte)'b';
+                heartBeatMess[9] = (byte)'e';
+                heartBeatMess[10] = (byte)'a';
+                heartBeatMess[11] = (byte)'t';
                 byte[] counts = BitConverter.GetBytes(bindingTester.BindingT);
-                heartBeatMess[4] = counts[0];
-                heartBeatMess[5] = counts[1];
-                heartBeatMess[6] = counts[2];
-                heartBeatMess[7] = counts[3];
-                heartBeatMess[519] = 0;
-                heartBeatMess[520] = 0;
+                heartBeatMess[12] = counts[0];
+                heartBeatMess[13] = counts[1];
+                heartBeatMess[14] = counts[2];
                 heartBeatMess[521] = (byte)']';
 
                 WIFIcofig.ServerMessageSend = heartBeatMess;
+            }
+            else if(!Bootloader.bootContinue)
+            {
+                Bootloader.BootSentIndex = 0;
             }
         }
 
         int prevCount = 0;
         //int prevClients = 0;
-        //int textprevCount = 0;
+        int textprevCount = 0;
 
         public byte[] heartBeatMess = Enumerable.Repeat((byte)0, 522).ToArray();
 
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        private void WindowUpdateTimer(object sender, EventArgs e)
         {
+            
+            #region screens
+            if (Bootloader.BootMessage!=null)
+                heartBeatlbl.Content = Bootloader.BootMessage;
 
-
-            if(ProgramFlow.ProgramWindow == (int)ProgramFlowE.Startup)
+            if (ProgramFlow.ProgramWindow == (int)ProgramFlowE.Startup)
             {
                 DataView.Visibility = ConfigureView.Visibility = BootloaderView.Visibility = Visibility.Collapsed;                
             }
@@ -123,18 +139,36 @@ namespace WIFI_Config_App
             {
                 StartUpView.Visibility = DataView.Visibility = ConfigureView.Visibility = BootloaderView.Visibility = Visibility.Collapsed;
             }
+            #endregion
 
             bindingTester.BindingT++;
+            selectedIP.Content = WIFIcofig.SelectedIP;
+            WiFiApStatus.Content = WIFIcofig.WiFiApStatus;
+            ConnectedDevicesCount.Content = WIFIcofig.clients.Count;
+
+            if(WIFIcofig.NetworkDevicesp.Where(t => t.DeviceName.Contains("Wireless")).Count() > 0)
+            {
+                WIFIcofig.WiFiApStatus = "Wifi Accesspoint Up";
+            }
+            else
+            {
+                WIFIcofig.WiFiApStatus = "Wifi Accesspoint Error";
+            }
+
             if (WIFIcofig.clients != null)
             {
-                ConnectedDevicesCount.Content = WIFIcofig.clients.Count;
+               
                 if(WIFIcofig.clients.Count>0)
                 {
                     SendMessage.IsEnabled = true;
                     Bootload.IsEnabled = true;
+                    if(WIFIcofig.clients.Count == 1)
+                        WIFIcofig.SelectedIP = WIFIcofig.TCPclients[0].IP.ToString();
+
                 }
                 else
                 {
+                    WIFIcofig.SelectedIP = null;
                     Bootload.IsEnabled = SendMessage.IsEnabled = false;
 //                    BootloaderView.Visibility = Visibility.Collapsed;
                 }                    
@@ -151,11 +185,11 @@ namespace WIFI_Config_App
             }
 
 
-            //if (WIFIcofig.ServerMessage!=null && textprevCount != WIFIcofig.ServerMessage.Count)
-            //{
-            //    MessagesGet.ItemsSource = WIFIcofig.ServerMessage;
- //           RecievedMessagesCount.Content = WIFIcofig.ServerMessage.Count;
-            //}
+            if (WIFIcofig.ServerMessagges != null && textprevCount != WIFIcofig.ServerMessagges.Count)
+            {
+ //               WIFIcofig.ServerMessage = WIFIcofig.ServerMessagges;
+                textprevCount = WIFIcofig.ServerMessage.Count;
+            }
 
             LocalIpsCount.Content = WIFIcofig.NetworkDevicesp.Count.ToString();
             if(WIFIcofig.NetworkDevicesp.Count != prevCount)
@@ -198,14 +232,11 @@ namespace WIFI_Config_App
                 connect = false;
             }
 
-            
-            //lstLocal.ItemsSource = WIFIcofig.NetworkDevices;
-
         }
 
         private void CreateServer_Click(object sender, RoutedEventArgs e)
         {
-            WIFIcofig.serverRun();
+            WIFIcofig.ServerRun();
         }
 
         private int DatagridIndx = 0;
@@ -231,13 +262,11 @@ namespace WIFI_Config_App
         {
             if(ConnectedDevices.SelectedIndex!=-1)
             {
-                WIFIcofig.SelectedIP = WIFIcofig.TCPclients[ConnectedDevices.SelectedIndex].IP;
-                selectedIP.Content = WIFIcofig.SelectedIP;
+                WIFIcofig.SelectedIP = WIFIcofig.TCPclients[ConnectedDevices.SelectedIndex].IP;                
             }
             else
             {
                 WIFIcofig.BroadCast = true;
-                WIFIcofig.SelectedIP = "";
             }
         }
 
