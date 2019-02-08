@@ -77,25 +77,9 @@ namespace WIFI_Config_App
         {
             if (!Bootloader.BootReady)
             {
-                heartBeatMess[0] = (byte)'[';
-                heartBeatMess[1] = (byte)'&';
-                heartBeatMess[2] = (byte)'h';
-                heartBeatMess[3] = (byte)'h';
-                heartBeatMess[4] = (byte)'e';
-                heartBeatMess[5] = (byte)'a';
-                heartBeatMess[6] = (byte)'r';
-                heartBeatMess[7] = (byte)'t';
-                heartBeatMess[8] = (byte)'b';
-                heartBeatMess[9] = (byte)'e';
-                heartBeatMess[10] = (byte)'a';
-                heartBeatMess[11] = (byte)'t';
-                byte[] counts = BitConverter.GetBytes(bindingTester.BindingT);
-                heartBeatMess[12] = counts[0];
-                heartBeatMess[13] = counts[1];
-                heartBeatMess[14] = counts[2];
-                heartBeatMess[521] = (byte)']';
+                
 
-                WIFIcofig.ServerMessageSend = heartBeatMess;
+                //WIFIcofig.ServerMessageSend = heartBeatMess;
             }
             else if(!Bootloader.bootContinue)
             {
@@ -107,7 +91,7 @@ namespace WIFI_Config_App
         //int prevClients = 0;
         int textprevCount = 0;
 
-        public byte[] heartBeatMess = Enumerable.Repeat((byte)0, 522).ToArray();
+        
 
         private void WindowUpdateTimer(object sender, EventArgs e)
         {

@@ -323,6 +323,27 @@ namespace WIFI_Config_App
                         ServerStatus = "Received: " + recmeg + " from: " + clientR[0].RemoteEndPoint;
                         //ServerMessage.Add(recmeg + " from: " + clientR[0].RemoteEndPoint);
                         ServerMessagges.Add(new ClientMessage() { DeviceIP = clientR[0].RemoteEndPoint.ToString(), Message = recmeg });
+
+                        if (data2[2] == 'h' /*&& message.Length == 522*/)
+                        {
+                            byte[] heartBeatMess = Enumerable.Repeat((byte)0, 522).ToArray();
+                            heartBeatMess[0] = (byte)'[';
+                            heartBeatMess[1] = (byte)'&';
+                            heartBeatMess[2] = (byte)'h';
+                            heartBeatMess[3] = (byte)'h';
+                            heartBeatMess[4] = (byte)'e';
+                            heartBeatMess[5] = (byte)'a';
+                            heartBeatMess[6] = (byte)'r';
+                            heartBeatMess[7] = (byte)'t';
+                            heartBeatMess[8] = (byte)'b';
+                            heartBeatMess[9] = (byte)'e';
+                            heartBeatMess[10] = (byte)'a';
+                            heartBeatMess[11] = (byte)'t';
+                            heartBeatMess[521] = (byte)']';
+                            clientR[0].Send(heartBeatMess, heartBeatMess.Length, SocketFlags.None); //Send the data to the client
+                            Console.WriteLine("====================heartbeat recieved ======================");
+                        }
+
                         //WiFimessages.Parse(data2, clientnumr);
                         bootloader.BootloaderParse(data2, clientnumr);
 
@@ -341,14 +362,26 @@ namespace WIFI_Config_App
 
         private void SendBytes(EndPoint clientnumr, int remover)
         {
-            
 
-            string welcome = "Welcome"; //This is the data we we'll respond with      
-            byte[] data = new byte[welcome.Length];
-            data = Encoding.ASCII.GetBytes(welcome); //Encode the data
+            byte[] heartBeatMess = Enumerable.Repeat((byte)0, 522).ToArray();
+            heartBeatMess[0] = (byte)'[';
+            heartBeatMess[1] = (byte)'&';
+            heartBeatMess[2] = (byte)'h';
+            heartBeatMess[3] = (byte)'h';
+            heartBeatMess[4] = (byte)'e';
+            heartBeatMess[5] = (byte)'a';
+            heartBeatMess[6] = (byte)'r';
+            heartBeatMess[7] = (byte)'t';
+            heartBeatMess[8] = (byte)'b';
+            heartBeatMess[9] = (byte)'e';
+            heartBeatMess[10] = (byte)'a';
+            heartBeatMess[11] = (byte)'t';
+            heartBeatMess[521] = (byte)']';
+           
             List<Socket> clientR = clients.Where(t => t.RemoteEndPoint == clientnumr).ToList();
-            clientR[0].Send(data, data.Length, SocketFlags.None); //Send the data to the client
-            
+            clientR[0].Send(heartBeatMess, heartBeatMess.Length, SocketFlags.None); //Send the data to the client
+            byte[] data = new byte[heartBeatMess.Length];
+
             while (!clientR[0].Poll(10, SelectMode.SelectRead) && !CloseConnectAll)
             {
                 try
@@ -447,6 +480,40 @@ namespace WIFI_Config_App
             get { return _IP; }
             set { _IP = value; OnPropertyChanged("IP"); }
         }
+
+        private string _Name;
+
+        public string Name
+        {
+            get { return _Name; }
+            set { _Name = value; OnPropertyChanged("Name"); }
+        }
+
+        private int _VID;
+
+        public int VID
+        {
+            get { return _VID; }
+            set { _VID = value; OnPropertyChanged("VID"); }
+        }
+
+        private int _FirmRev;
+
+        public int FirmRev
+        {
+            get { return _FirmRev; }
+            set { _FirmRev = value; OnPropertyChanged("FirmRev"); }
+        }
+
+        private int _FirmSubRev;
+
+        public int FirmSubRev
+        {
+            get { return _FirmSubRev; }
+            set { _FirmSubRev = value; OnPropertyChanged("FirmSubRev"); }
+        }
+
+
 
     }
 

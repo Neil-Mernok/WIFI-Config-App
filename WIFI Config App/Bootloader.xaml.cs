@@ -239,12 +239,6 @@ namespace WIFI_Config_App
 
                     }
                 }
-                else if(message[2] == 'h' /*&& message.Length == 522*/)
-                {
-                    BootMessage = "==heartbeat " + heart.ToString() + " recieved==";
-                    heart++;
-                    Console.WriteLine("====================heartbeat recieved ======================");
-                }
             }
         }
     }
